@@ -1,24 +1,23 @@
-{-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE EmptyDataDecls #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes        #-}
+{-# LANGUAGE DataKinds                  #-}
+{-# LANGUAGE DeriveAnyClass             #-}
+{-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE DerivingStrategies         #-}
+{-# LANGUAGE EmptyDataDecls             #-}
+{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE NamedFieldPuns #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PartialTypeSignatures #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE ViewPatterns #-}
-{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE NamedFieldPuns             #-}
+{-# LANGUAGE NoImplicitPrelude          #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE PartialTypeSignatures      #-}
+{-# LANGUAGE RecordWildCards            #-}
+{-# LANGUAGE ScopedTypeVariables        #-}
+{-# LANGUAGE TemplateHaskell            #-}
+{-# LANGUAGE TypeApplications           #-}
+{-# LANGUAGE TypeFamilies               #-}
+{-# LANGUAGE TypeOperators              #-}
 {-# OPTIONS_GHC -Wno-simplifiable-class-constraints #-}
 {-# OPTIONS_GHC -fno-omit-interface-pragmas #-}
 {-# OPTIONS_GHC -fno-specialise #-}
@@ -34,30 +33,30 @@ module ErgoDex.Contracts.Pool (
     burnLqInitial
 ) where
 
-import qualified Prelude as Haskell
+import qualified Prelude                  as Haskell
 
-import ErgoDex.Contracts.Types
-import qualified GHC.Generics as Haskell
-import Plutus.V1.Ledger.Value (AssetClass, assetClassValueOf, flattenValue)
+import           ErgoDex.Contracts.Types
+import qualified GHC.Generics             as Haskell
+import           PlutusLedgerApi.V1.Value (AssetClass)
 import qualified PlutusTx
-import PlutusTx.Builtins
-import PlutusTx.Prelude
+import           PlutusTx.Builtins
+import           PlutusTx.Prelude
 
 -- Unwrapped representation of PoolConfig
 data PoolConfig = PoolConfig
-    { poolNft :: AssetClass
-    , poolX   :: AssetClass
-    , poolY   :: AssetClass
-    , poolLq  :: AssetClass
+    { poolNft    :: AssetClass
+    , poolX      :: AssetClass
+    , poolY      :: AssetClass
+    , poolLq     :: AssetClass
     , poolFeeNum :: Integer
     }
-    deriving (Haskell.Show, Eq)
+    deriving (Haskell.Show, Haskell.Eq)
 
 PlutusTx.makeIsDataIndexed ''PoolConfig [('PoolConfig, 0)]
 PlutusTx.makeLift ''PoolConfig
 
 data PoolAction = Deposit | Redeem | Swap | Destroy
-    deriving (Haskell.Show)
+    deriving (Haskell.Show, Haskell.Eq)
 PlutusTx.makeLift ''PoolAction
 
 instance PlutusTx.FromData PoolAction where
@@ -79,15 +78,15 @@ instance PlutusTx.ToData PoolAction where
     {-# INLINE toBuiltinData #-}
     toBuiltinData a = mkI $ case a of
         Deposit -> 0
-        Redeem -> 1
-        Swap -> 2
+        Redeem  -> 1
+        Swap    -> 2
         Destroy -> 3
 
 data PoolRedeemer = PoolRedeemer
     { action :: PoolAction
     , selfIx :: Integer
     }
-    deriving (Haskell.Show, Eq, Haskell.Generic)
+    deriving (Haskell.Show, Haskell.Eq, Haskell.Generic)
 
 PlutusTx.makeIsDataIndexed ''PoolRedeemer [('PoolRedeemer, 0)]
 

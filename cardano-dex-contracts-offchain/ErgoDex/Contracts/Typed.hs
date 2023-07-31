@@ -7,7 +7,6 @@ module ErgoDex.Contracts.Typed where
 
 import qualified Prelude as Haskell
 
-import Data.Aeson (FromJSON, ToJSON)
 import ErgoDex.Contracts.Class
 import qualified ErgoDex.Contracts.Pool as P
 import ErgoDex.Contracts.Types

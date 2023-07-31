@@ -30,8 +30,8 @@ module ErgoDex.Contracts.Proxy.Swap where
 import qualified Prelude as Haskell
 
 import qualified GHC.Generics as GHC
-import Plutus.V1.Ledger.Api (PubKeyHash)
-import Plutus.V1.Ledger.Value
+import           PlutusLedgerApi.V1       (PubKeyHash)
+import           PlutusLedgerApi.V1.Value (AssetClass)
 import qualified PlutusTx
 import PlutusTx.Prelude
 

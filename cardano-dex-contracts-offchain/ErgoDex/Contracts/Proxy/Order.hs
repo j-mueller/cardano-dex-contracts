@@ -1,24 +1,23 @@
-{-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE EmptyDataDecls #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes        #-}
+{-# LANGUAGE DataKinds                  #-}
+{-# LANGUAGE DeriveAnyClass             #-}
+{-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE DerivingStrategies         #-}
+{-# LANGUAGE EmptyDataDecls             #-}
+{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE NamedFieldPuns #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PartialTypeSignatures #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE ViewPatterns #-}
-{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE NamedFieldPuns             #-}
+{-# LANGUAGE NoImplicitPrelude          #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE PartialTypeSignatures      #-}
+{-# LANGUAGE RecordWildCards            #-}
+{-# LANGUAGE ScopedTypeVariables        #-}
+{-# LANGUAGE TemplateHaskell            #-}
+{-# LANGUAGE TypeApplications           #-}
+{-# LANGUAGE TypeFamilies               #-}
+{-# LANGUAGE TypeOperators              #-}
 {-# OPTIONS_GHC -Wno-simplifiable-class-constraints #-}
 {-# OPTIONS_GHC -fno-omit-interface-pragmas #-}
 {-# OPTIONS_GHC -fno-specialise #-}
@@ -30,15 +29,15 @@ module ErgoDex.Contracts.Proxy.Order (
     isAda,
 ) where
 
-import qualified Prelude as Haskell
+import qualified Prelude                  as Haskell
 
-import Plutus.V1.Ledger.Value
+import           PlutusLedgerApi.V1.Value (AssetClass)
 import qualified PlutusTx
-import PlutusTx.Builtins
-import PlutusTx.IsData.Class
-import PlutusTx.Prelude
+import           PlutusTx.Builtins
+import           PlutusTx.IsData.Class
+import           PlutusTx.Prelude
 
-import ErgoDex.Plutus (adaAssetClass)
+import           ErgoDex.Plutus           (adaAssetClass)
 
 data OrderAction = Apply | Refund
     deriving (Haskell.Show)
@@ -60,16 +59,17 @@ instance UnsafeFromData OrderAction where
 instance ToData OrderAction where
     {-# INLINE toBuiltinData #-}
     toBuiltinData a = mkI $ case a of
-        Apply -> 0
+        Apply  -> 0
         Refund -> 1
 
 data OrderRedeemer = OrderRedeemer
-    { poolInIx :: Integer
-    , orderInIx :: Integer
+    { poolInIx    :: Integer
+    , orderInIx   :: Integer
     , rewardOutIx :: Integer
-    , action :: OrderAction
+    , action      :: OrderAction
     }
     deriving stock (Haskell.Show)
+
 PlutusTx.makeIsDataIndexed ''OrderRedeemer [('OrderRedeemer, 0)]
 PlutusTx.makeLift ''OrderRedeemer
 

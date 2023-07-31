@@ -1,13 +1,12 @@
-{-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes   #-}
+{-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE DerivingStrategies    #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE PartialTypeSignatures #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE TypeFamilies          #-}
 {-# OPTIONS_GHC -Wno-simplifiable-class-constraints #-}
 {-# OPTIONS_GHC -fno-omit-interface-pragmas #-}
 {-# OPTIONS_GHC -fno-specialise #-}
@@ -15,16 +14,18 @@
 
 module ErgoDex.Plutus where
 
-import qualified Plutus.V1.Ledger.Value as Value
-import Plutus.V1.Ledger.Contexts
-import Plutus.V1.Ledger.Value
-import PlutusTx.Prelude
+import           PlutusLedgerApi.V1.Value (AssetClass)
+import qualified PlutusLedgerApi.V1.Value as Value
+import           PlutusLedgerApi.V2       (ScriptContext, TxInInfo, Value,
+                                           scriptContextTxInfo,
+                                           txInInfoResolved, txInfoInputs,
+                                           txOutValue)
 
 adaAssetClass :: AssetClass
-adaAssetClass = assetClass Value.adaSymbol Value.adaToken
+adaAssetClass = Value.assetClass Value.adaSymbol Value.adaToken
 
 valueWithin :: TxInInfo -> Value
 valueWithin = txOutValue . txInInfoResolved
 
-inputsNum :: ScriptContext -> Integer
+inputsNum :: ScriptContext -> Int
 inputsNum sCtx = length $ txInfoInputs $ scriptContextTxInfo sCtx

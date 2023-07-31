@@ -1,18 +1,18 @@
-{-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE EmptyDataDecls #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes        #-}
+{-# LANGUAGE DataKinds                  #-}
+{-# LANGUAGE DeriveAnyClass             #-}
+{-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE DerivingStrategies         #-}
+{-# LANGUAGE EmptyDataDecls             #-}
+{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PartialTypeSignatures #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE NoImplicitPrelude          #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE PartialTypeSignatures      #-}
+{-# LANGUAGE ScopedTypeVariables        #-}
+{-# LANGUAGE TypeFamilies               #-}
 {-# OPTIONS_GHC -Wno-simplifiable-class-constraints #-}
 {-# OPTIONS_GHC -fno-omit-interface-pragmas #-}
 {-# OPTIONS_GHC -fno-specialise #-}
@@ -20,22 +20,16 @@
 
 module ErgoDex.Contracts.Types where
 
-import Data.Aeson (FromJSON, ToJSON)
-import GHC.Generics (Generic)
+import           Data.Aeson               (FromJSON, ToJSON)
+import           GHC.Generics             (Generic)
 
-import ErgoDex.Plutus (adaAssetClass)
-import qualified Data.Text as Text
-import qualified Data.Aeson as JSON
-import qualified Data.Aeson.Types as JSON
-import Plutus.V1.Ledger.Value (AssetClass (..), Value (..), assetClassValue, assetClassValueOf, TokenName(..), CurrencySymbol(..))
-import qualified Data.ByteString.Base16  as Base16
-import qualified Data.ByteString as BSS
-import qualified Data.Text.Encoding  as TE
-import Control.Monad ((>=>))
+import           ErgoDex.Plutus           (adaAssetClass)
+import           PlutusLedgerApi.V1.Value (AssetClass (..), Value (..),
+                                           assetClassValue, assetClassValueOf)
 import qualified PlutusTx
-import PlutusTx.Prelude
-import Text.Printf (PrintfArg)
-import qualified Prelude as Haskell
+import           PlutusTx.Prelude
+import qualified Prelude                  as Haskell
+import           Text.Printf              (PrintfArg)
 
 data Lovelace = Lovelace deriving (Haskell.Show, Haskell.Eq, Generic)
 
