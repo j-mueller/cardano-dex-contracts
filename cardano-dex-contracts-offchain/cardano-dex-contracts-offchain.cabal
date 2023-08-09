@@ -101,6 +101,7 @@ library
   other-modules:   Paths_cardano_dex_contracts_offchain
   autogen-modules: Paths_cardano_dex_contracts_offchain
   exposed-modules:
+    ErgoDex.CardanoApi
     ErgoDex.Contracts.Class
     ErgoDex.Contracts.Pool
     ErgoDex.Contracts.Proxy.Deposit
@@ -125,6 +126,8 @@ library
     , serialise
     , cardano-api
     , cardano-binary
+    , cardano-dex-contracts-onchain
+    , plutarch
 
 test-suite cardano-dex-contracts-test
   type: exitcode-stdio-1.0
