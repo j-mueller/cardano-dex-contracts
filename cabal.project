@@ -38,6 +38,7 @@ source-repository-package
 
 packages: 
   ./cardano-dex-contracts-onchain
+  ./cardano-dex-contracts-offchain
 
 -- You never, ever, want this.
 write-ghc-environment-files: never
