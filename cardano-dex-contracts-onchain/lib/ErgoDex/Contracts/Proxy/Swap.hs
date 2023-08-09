@@ -8,7 +8,6 @@ module ErgoDex.Contracts.Proxy.Swap (
 import PlutusLedgerApi.V1.Crypto (PubKeyHash)
 import PlutusLedgerApi.V1.Value
 import qualified PlutusTx
-import PlutusTx.Builtins
 
 data SwapConfig = SwapConfig
     { base    :: AssetClass

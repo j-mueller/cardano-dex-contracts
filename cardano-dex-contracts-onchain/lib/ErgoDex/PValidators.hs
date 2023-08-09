@@ -3,12 +3,8 @@ module ErgoDex.PValidators (
     swapValidator,
     depositValidator,
     redeemValidator,
-    validatorAddress,
     wrapValidator,
 ) where
-
-import PlutusLedgerApi.V1.Scripts (Validator (getValidator))
-import PlutusLedgerApi.V1.Address
 
 import qualified ErgoDex.PContracts.PDeposit as PD
 import qualified ErgoDex.PContracts.PPool    as PP
@@ -16,11 +12,10 @@ import qualified ErgoDex.PContracts.PRedeem  as PR
 import qualified ErgoDex.PContracts.PSwap    as PS
 
 import Plutarch
-import Plutarch.Api.V2 (mkValidator, validatorHash)
 import Plutarch.Api.V2.Contexts (PScriptContext)
 import Plutarch.Prelude
-import Plutarch.Unsafe (punsafeCoerce)
 import Plutarch.Internal
+import Data.Text (Text)
 
 cfgForValidator :: Config
 cfgForValidator = Config NoTracing
@@ -35,17 +30,14 @@ wrapValidator validator = plam $ \datum redeemer ctx ->
         result = validator # dt # rdmr # ctx
      in popaque $ pif result (pcon PUnit) (ptraceError "Validator reduced to False")
 
-poolValidator :: Validator
-poolValidator = mkValidator cfgForValidator $ wrapValidator PP.poolValidatorT
+poolValidator :: Either Text Script
+poolValidator = compile cfgForValidator $ wrapValidator PP.poolValidatorT
 
-swapValidator :: Validator
-swapValidator = mkValidator cfgForValidator $ wrapValidator PS.swapValidatorT
+swapValidator :: Either Text Script
+swapValidator = compile cfgForValidator $ wrapValidator PS.swapValidatorT
 
-depositValidator :: Validator
-depositValidator = mkValidator cfgForValidator $ wrapValidator PD.depositValidatorT
+depositValidator :: Either Text Script
+depositValidator = compile cfgForValidator $ wrapValidator PD.depositValidatorT
 
-redeemValidator :: Validator
-redeemValidator = mkValidator cfgForValidator $ wrapValidator PR.redeemValidatorT
-
-validatorAddress :: Validator -> Address
-validatorAddress = scriptHashAddress . validatorHash
+redeemValidator :: Either Text Script
+redeemValidator = compile cfgForValidator $ wrapValidator PR.redeemValidatorT

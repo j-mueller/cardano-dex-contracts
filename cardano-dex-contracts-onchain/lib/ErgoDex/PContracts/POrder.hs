@@ -7,11 +7,9 @@ module ErgoDex.PContracts.POrder (
 ) where
 
 import qualified GHC.Generics       as GHC
-import           Generics.SOP       (Generic, I (I))
 
-import qualified Plutarch.Prelude             as P
 import           Plutarch
-import           Plutarch.Internal.PlutusType (PInner, PlutusType, pcon',pmatch')
+import           Plutarch.Internal.PlutusType (pcon',pmatch')
 import           Plutarch.Builtin             (PIsData (..), pasInt, pforgetData)
 import           Plutarch.DataRepr            (DerivePConstantViaData (..), PDataFields)
 import           Plutarch.Lift
@@ -50,8 +48,7 @@ newtype OrderRedeemer (s :: S)
             )
         )
     deriving stock (GHC.Generic)
-    deriving
-        (PIsData, PDataFields, PlutusType)
+    deriving anyclass (PIsData, PDataFields, PlutusType)
 
 instance DerivePlutusType OrderRedeemer where type DPTStrat _ = PlutusTypeData
 

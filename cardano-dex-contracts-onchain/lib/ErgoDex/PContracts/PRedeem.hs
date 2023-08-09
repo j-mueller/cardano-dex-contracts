@@ -41,12 +41,12 @@ newtype RedeemConfig (s :: S)
             )
         )
     deriving stock (GHC.Generic)
-    deriving
-        (PIsData, PDataFields, PlutusType)
+    deriving anyclass (PIsData, PDataFields, PlutusType)
 
 instance DerivePlutusType RedeemConfig where type DPTStrat _ = PlutusTypeData
 
 instance PUnsafeLiftDecl RedeemConfig where type PLifted RedeemConfig = R.RedeemConfig
+
 deriving via (DerivePConstantViaData R.RedeemConfig RedeemConfig) instance (PConstantDecl R.RedeemConfig)
 
 redeemValidatorT :: ClosedTerm (RedeemConfig :--> OrderRedeemer :--> PScriptContext :--> PBool)

@@ -6,7 +6,6 @@ module ErgoDex.Contracts.Proxy.Deposit where
 import PlutusLedgerApi.V1.Crypto (PubKeyHash)
 import PlutusLedgerApi.V1.Value
 import qualified PlutusTx
-import PlutusTx.Builtins
 
 data DepositConfig = DepositConfig
     { poolNft :: AssetClass
