@@ -15,7 +15,7 @@ license:       CC0-1.0
 license-files: LICENSE
 author:        ErgoLabs
 maintainer:    ilya.arcadich@gmail.com
-data-files:    deposit.uplc swap.uplc redeem.uplc pool.uplc
+data-files:    deposit.uplc swap.uplc redeem.uplc pool.uplc simpleStaking.uplc
 data-dir:      Contracts
 
 -- A copyright notice.

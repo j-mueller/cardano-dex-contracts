@@ -1,18 +1,22 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module ErgoDex.PMintingValidators (
     poolNftMiningValidator,
     poolLqMiningValidator,
+    poolStakeChangeMintPolicyValidator,
     wrapMintingValidator,
 ) where
 
-import           Plutarch
-import           Plutarch.Api.V2.Contexts    (PScriptContext)
-import           Plutarch.Prelude
-import           Plutarch.Unsafe             (punsafeCoerce)
-
-import           Data.Text                   (Text)
-import qualified ErgoDex.PContracts.PAssets  as A
-import           PlutusLedgerApi.V1.Contexts
-import           PlutusLedgerApi.V1.Value    (TokenName)
+import Plutarch
+import Plutarch.Api.V2.Contexts (PScriptContext)
+import Plutarch.Prelude
+import Plutarch.Unsafe (punsafeCoerce)
+import Data.Text (Text)
+import qualified ErgoDex.PContracts.PAssets as A
+import ErgoDex.PContracts.PPoolStakeChangeMintPolicy
+import PlutusLedgerApi.V1.Value   (TokenName(..), AssetClass(..))
+import PlutusLedgerApi.V1.Crypto  (PubKeyHash)
+import PlutusLedgerApi.V1.Contexts
 
 cfgForMintingValidator :: Config
 cfgForMintingValidator = Config NoTracing
@@ -37,3 +41,9 @@ poolLqMiningValidator oref tn emission =
     compile cfgForMintingValidator $
         wrapMintingValidator $
             A.poolLqMintValidatorT (pconstant oref) (pconstant tn) (pconstant emission)
+
+poolStakeChangeMintPolicyValidator :: AssetClass -> [PubKeyHash] -> Integer -> Either Text Script
+poolStakeChangeMintPolicyValidator ac stakeAdminPkh threshold = 
+    compile cfgForMintingValidator $ 
+        wrapMintingValidator $
+            poolStakeChangeMintPolicyValidatorT (pconstant ac) (pconstant stakeAdminPkh) (pconstant threshold)

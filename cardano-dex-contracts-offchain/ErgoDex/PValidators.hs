@@ -3,6 +3,8 @@ module ErgoDex.PValidators (
     swapValidator,
     depositValidator,
     redeemValidator,
+    simpleStakingValidator,
+    lockPkhStakingValidator
 ) where
 
 import qualified Cardano.Api                          as C
@@ -35,6 +37,18 @@ redeemValidatorDataFileName = "redeem.uplc"
 
 redeemValidator :: (MonadIO m) => m (Either DecoderError (C.Script C.PlutusScriptV2))
 redeemValidator = readValidatorFromFile redeemValidatorDataFileName
+
+simpleStakingValidatorDataFileName :: String
+simpleStakingValidatorDataFileName = "simpleStaking.uplc"
+
+simpleStakingValidator :: (MonadIO m) => m (Either DecoderError (C.Script C.PlutusScriptV2))
+simpleStakingValidator = readValidatorFromFile simpleStakingValidatorDataFileName
+
+lockPkhStakingValidatorDataFileName :: String
+lockPkhStakingValidatorDataFileName = "stakinWithPkh.uplc"
+
+lockPkhStakingValidator :: (MonadIO m) => m (Either DecoderError (C.Script C.PlutusScriptV2))
+lockPkhStakingValidator = readValidatorFromFile lockPkhStakingValidatorDataFileName
 
 readValidatorFromFile :: (MonadIO m) => String -> m (Either DecoderError (C.Script C.PlutusScriptV2))
 readValidatorFromFile dataFieldName = do

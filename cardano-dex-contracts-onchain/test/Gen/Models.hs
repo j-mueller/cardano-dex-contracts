@@ -5,6 +5,9 @@ module Gen.Models
   , genTxId
   , genTxOutRef
   , genCurrencySymbol
+  , random16bs
+  , random28bs
+  , random32bs
   , mkAdaAssetClass
   , genAssetClass
   , mkAssetClass
@@ -27,11 +30,19 @@ module Gen.Models
   , mkSwapValidator
   , mkPoolValidator
   , mkTxOut
+  , mkUserTxOut
+  , mkUserTxOutWithDatum
+  , mkTxOutWithSC
   , mkTxOut'
   , mkTxIn
   , mkTxInfo
+  , mkTxInfoWithSignatures
+  , mkTxInfoWithSignaturesAndMinting
+  , mkTxInfoOnlyWithSignatures
   , mkPoolTxInfo
   , mkPurpose
+  , mkRewardingPurpose
+  , mkDelegatingPurpose
   , mkContext
   ) where
 
@@ -62,6 +73,12 @@ genBuiltinByteString s = bytes (Range.singleton s) <&> BuiltinByteString
 
 random32bs :: MonadGen f => f BuiltinByteString
 random32bs = genBuiltinByteString 32
+
+random28bs :: MonadGen f => f BuiltinByteString
+random28bs = genBuiltinByteString 28
+
+random16bs :: MonadGen f => f BuiltinByteString
+random16bs = genBuiltinByteString 16
 
 genTxId :: MonadGen f => f TxId
 genTxId = prune $ random32bs <&> TxId
@@ -104,8 +121,8 @@ mkValues :: [Value] -> Value -> Value
 mkValues (x:xs) acc = mkValues xs (x <> acc)
 mkValues [] acc = acc
 
-mkPoolConfig :: AssetClass -> AssetClass -> AssetClass -> AssetClass -> Integer -> P.PoolConfig
-mkPoolConfig nft x y lq fee = P.PoolConfig nft x y lq fee
+mkPoolConfig :: AssetClass -> AssetClass -> AssetClass -> AssetClass -> Integer -> [CurrencySymbol] -> Integer -> P.PoolConfig
+mkPoolConfig nft x y lq fee stakeAdminCS lqBound = P.PoolConfig nft x y lq fee stakeAdminCS lqBound
 
 mkDepositConfig :: AssetClass -> AssetClass -> AssetClass -> AssetClass -> Integer -> PubKeyHash -> Integer -> D.DepositConfig
 mkDepositConfig nft x y lq fee pkh cFee = D.DepositConfig nft x y lq fee pkh Nothing cFee
@@ -158,6 +175,33 @@ mkTxOut od v vh =
     , txOutReferenceScript = Nothing
     }
 
+mkUserTxOut :: Value -> PubKeyHash -> TxOut
+mkUserTxOut v pkh =
+  TxOut
+    { txOutAddress = Address (PubKeyCredential pkh) Nothing
+    , txOutValue   = v
+    , txOutDatum   = NoOutputDatum
+    , txOutReferenceScript = Nothing
+    }
+
+mkUserTxOutWithDatum :: OutputDatum -> Value -> PubKeyHash -> TxOut
+mkUserTxOutWithDatum od v pkh =
+  TxOut
+    { txOutAddress = Address (PubKeyCredential pkh) Nothing
+    , txOutValue   = v
+    , txOutDatum   = od
+    , txOutReferenceScript = Nothing
+    }
+
+mkTxOutWithSC :: OutputDatum -> Value -> ValidatorHash -> Maybe StakingCredential -> TxOut
+mkTxOutWithSC od v vh sc =
+  TxOut
+    { txOutAddress = Address (ScriptCredential vh) sc
+    , txOutValue   = v
+    , txOutDatum   = od
+    , txOutReferenceScript = Nothing
+    }
+
 mkTxOut' :: OutputDatum -> Value -> PubKeyHash -> TxOut
 mkTxOut' od v pkh =
   TxOut
@@ -189,7 +233,6 @@ mkPoolTxInfo pIn pOut =
     , txInfoId = "b0"
     }
 
-
 mkTxInfo :: TxInInfo -> TxInInfo -> TxOut -> TxOut -> TxInfo
 mkTxInfo pIn oIn pOut oOut =
   TxInfo
@@ -205,8 +248,59 @@ mkTxInfo pIn oIn pOut oOut =
     , txInfoId = "b0"
     }
 
+mkTxInfoWithSignatures :: [TxInInfo] -> [TxOut] -> [PubKeyHash] -> TxInfo
+mkTxInfoWithSignatures pIns pOuts sigs =
+  TxInfo
+    { txInfoInputs = pIns
+    , txInfoOutputs = pOuts
+    , txInfoFee = mempty
+    , txInfoMint = mempty
+    , txInfoDCert = []
+    , txInfoWdrl = fromList []
+    , txInfoValidRange = Interval.always
+    , txInfoSignatories = sigs
+    , txInfoData = fromList []
+    , txInfoId = "b0"
+    }
+
+mkTxInfoWithSignaturesAndMinting :: [TxInInfo] -> TxOut -> [PubKeyHash] -> Value -> TxInfo
+mkTxInfoWithSignaturesAndMinting pIn pOut sigs mintValue =
+  TxInfo
+    { txInfoInputs = pIn
+    , txInfoOutputs = [pOut]
+    , txInfoFee = mempty
+    , txInfoMint = mintValue
+    , txInfoDCert = []
+    , txInfoWdrl = fromList []
+    , txInfoValidRange = Interval.always
+    , txInfoSignatories = sigs
+    , txInfoData = fromList []
+    , txInfoId = "b0"
+    }
+
+mkTxInfoOnlyWithSignatures :: [PubKeyHash] -> TxInfo
+mkTxInfoOnlyWithSignatures sigs =
+  TxInfo
+    { txInfoInputs = []
+    , txInfoOutputs = []
+    , txInfoFee = mempty
+    , txInfoMint = mempty
+    , txInfoDCert = []
+    , txInfoWdrl = fromList []
+    , txInfoValidRange = Interval.always
+    , txInfoSignatories = sigs
+    , txInfoData = fromList []
+    , txInfoId = "b0"
+    }
+
 mkPurpose :: TxOutRef -> ScriptPurpose
 mkPurpose = Spending
+
+mkRewardingPurpose :: StakingCredential -> ScriptPurpose
+mkRewardingPurpose sc = Rewarding sc
+
+mkDelegatingPurpose :: StakingCredential -> PubKeyHash -> ScriptPurpose
+mkDelegatingPurpose sc pkh = Certifying $ DCertDelegDelegate sc pkh
 
 mkContext :: TxInfo -> ScriptPurpose -> ScriptContext
 mkContext cxt purpose = ScriptContext cxt purpose

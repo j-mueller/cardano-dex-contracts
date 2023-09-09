@@ -18,11 +18,15 @@ module PExtra.API (
     findOwnInput,
     --convertBackValue,
     mustPayToPubKey,
+    ptryFromData,
+    pValueLength
 ) where
 
 import qualified GHC.Generics as GHC
 
 import Plutarch.Prelude
+import Plutarch.DataRepr
+import Plutarch.Lift
 
 import Plutarch.Api.V2 (
     PAddress (PAddress),
@@ -34,7 +38,9 @@ import Plutarch.Api.V2 (
     PTxInfo (..),
     PTxOut (..),
     PTxOutRef (..),
+    PMap (..)
  )
+import Plutarch
 
 import Plutarch.Api.V1 (
     PCredential (PPubKeyCredential),
@@ -44,11 +50,12 @@ import Plutarch.Api.V1 (
  )
 
 import qualified Plutarch.Api.V1.Value as PlutarchValue
-import Plutarch.DataRepr (PDataFields)
+import Plutarch.DataRepr (PDataFields, DerivePConstantViaData)
 import Plutarch.List (pconvertLists)
 import Plutarch.Extra.TermCont
 
 import PExtra.Monadic (tcon, tlet, tletField, tmatchField)
+import qualified PlutusLedgerApi.V1.Value   as Value
 
 tletUnwrap :: (PIsData a) => Term s (PAsData a) -> TermCont @r s (Term s a)
 tletUnwrap = tlet . pfromData
@@ -70,9 +77,12 @@ newtype PAssetClass (s :: S)
             )
         )
     deriving stock (GHC.Generic)
-    deriving anyclass (PIsData, PDataFields, PlutusType)
+    deriving anyclass (PIsData, PDataFields, PlutusType, PTryFrom PData)
 
 instance DerivePlutusType PAssetClass where type DPTStrat _ = PlutusTypeData
+
+instance PUnsafeLiftDecl PAssetClass where type PLifted PAssetClass = Value.AssetClass
+deriving via (DerivePConstantViaData Value.AssetClass PAssetClass) instance (PConstantDecl Value.AssetClass)
 
 instance PEq PAssetClass where
     a #== b =
@@ -199,3 +209,16 @@ convertAC' = phoistAcyclic $
         cs <- tletField @"currencySymbol" ac
         tn <- tletField @"tokenName" ac
         tcon $ PPair cs tn
+
+ptryFromData :: forall a s. PTryFrom PData (PAsData a) => Term s PData -> Term s (PAsData a)
+ptryFromData x = unTermCont $ fst <$> tcont (ptryFrom @(PAsData a) x)
+
+-- return correct qty of tokens in value
+pValueLength :: Term s (PValue _ _ :--> PInteger)
+pValueLength = plam $ \val -> outer #$ pto . pto $ val
+  where
+    outer :: ClosedTerm (PBuiltinList (PBuiltinPair (PAsData PCurrencySymbol) (PAsData (PMap k PTokenName PInteger))) :--> PInteger)
+    outer = pfix #$ plam $ \self m ->
+      pmatch m $ \case
+        PCons x xs -> (plength # (pto . pfromData $ psndBuiltin # x)) + self # xs
+        PNil -> pconstant 0

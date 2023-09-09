@@ -100,8 +100,13 @@ library
     ErgoDex.PContracts.PPool
     ErgoDex.PContracts.PRedeem
     ErgoDex.PContracts.PSwap
+    ErgoDex.PContracts.PSimpleStaking
+    ErgoDex.PContracts.PStakingWithPkhLock
+    ErgoDex.PContracts.PPoolStakeChangeMintPolicy
+    ErgoDex.PStakingValidators
     ErgoDex.PMintingValidators
     ErgoDex.PValidators
+    ErgoDex.PConstants
     PExtra.Ada
     PExtra.API
     PExtra.Integer
@@ -124,6 +129,7 @@ library
     , plutus-tx
     , text
     , transformers
+    , base16-bytestring
 
 test-suite cardano-dex-contracts-test
   type: exitcode-stdio-1.0
@@ -141,6 +147,9 @@ test-suite cardano-dex-contracts-test
     Tests.Pool
     Tests.Swap
     Tests.Redeem
+    Tests.Staking
+    Tests.StakeMinting
+    Tests.Api
     Eval
   build-depends:
     , base
